@@ -1,4 +1,4 @@
-# Audit-Report-Program
+# Audit-Report-Program v.0.1
  Python program to collate multiple Excel sheets into one Excel report
 
 HOW TO USE:
@@ -26,12 +26,7 @@ If the Files Processed does not match the number of files in the folder:
 
 If all else fails email @telimektar3
 
-<!-- Will need to be able to identify: -->
-<!-- 1. Specific cells on a specific sheet within a group of Excel documents
-    a. Batch select the Excel spreadsheets with a Folder select pop-up
-2. Store that information as a list (or do it as a dictionary since it will have a key and value? It should be easier to do as a list)
-3. Manipulate the information to get average percent score per discipline
-4. Output that information into another Excel sheet/report
-    a. Have the file name be auto-generated based on a set name and an auto-generated date
-    b. Should the file name include -2 if it's generated more than once on the same date? -->
+Still to implement:
+1. Identify the Policy number and discipline of "NO" items
+2. Identify the staff person responsible for the missed items
  
