@@ -14,6 +14,7 @@ mask = '%d%m%Y'
 dte = dt.now().strftime(mask)
 fname = "/Audit_Averages_Report_{}.xlsx".format(dte)
 ffname = "Audit_Averages_Report_{}.xlsx".format(dte)
+
 # Selects a folder containing the audit files necessary to be read using a visual interface
 root = Tk() # pointing root to Tk() to use it as Tk() in program.
 root.withdraw() # Hides small tkinter window.
