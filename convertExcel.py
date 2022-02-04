@@ -3,6 +3,7 @@
 
 # Batch reads and processes an auditing tool to determine the average audit score by discipline, and then outputs 
 # a file that includes the averages by discipline.
+import fractions
 from tkinter import Tk, filedialog
 import openpyxl
 import os
@@ -33,7 +34,7 @@ for filename in os.listdir(open_folder):
             files_to_rip.append(f)
     # print(files_to_rip)
 
-# Validates and imports the desired data from the list of files in the folder and stores in appropriate discipline
+# Imports and structures percentage scores and incomplete scores from the list of files in the folder and stores in new workbook
 social_work = []
 activity_therapy = []
 ics = []
@@ -94,6 +95,56 @@ activity_avg = (activity_sum / activity_length) * 100
 ics_avg = (ics_sum / ics_length) * 100
 transition_avg = (transition_sum / transition_length) * 100
 forensic_avg = (forensic_sum / forensic_length) * 100
+
+# Pulls "NO" marks from each workbook in selected folder
+
+def get_responsible_clinician(discipline): # this function returns the name of the clinician who matches the passed discipline
+    ws = wb['CLINICIANS']
+    counselor = ws['B4']
+    social_worker = ws['B2']
+    activity_therapist = ws['B3']
+    ts_counselor = ws['B6']
+    fcts = ws['B5']
+    discipline_dict = {"Adult Counseling": counselor, "Social Work": social_worker, "Activity Therapy": activity_therapist, "Transitional Services": ts_counselor, "Forensics Clinical Treatment Services": fcts}
+    if discipline in discipline_dict:
+        ws = wb['AUDIT TOOL']
+        return (discipline, discipline_dict[discipline][1])
+    else:
+        ws = wb['AUDIT TOOL']
+
+row_number = "" # variable to store the row value of the "NO" response so that it can be used to determine the discipline responsible
+audit_form_ranges = [19, 25, 31, 37, 43, 49, 55, 63, 69, 75, 81, 87, 93, 100, 106, 114, 120, 128, 134, 140, 146, 154, 160, 166, 172, 178, 184, 190, 196] # gives the item description cells which also act as bounds for the checks for "NO" "x or X" responses
+clinician_item = [] # will store the clinician responsible and the item missed as a list here
+def item_missed_getter(this_cell):
+     if this_cell != "":                          # if the cell has a value other than blank in it
+            this_cell_coord = this_cell.coordinate   # store it's coordinate in the sheet (ex. 'A7')
+            row_number = this_cell_coord[1:]         # store the row number without the column identifier
+            if row_number > audit_form_ranges[0] and row_number < audit_form_ranges[1]:
+                item_missed = ws['A19']
+            elif row_number > audit_form_ranges[1] and row_number < audit_form_ranges[2]:
+                item_missed = ws['A25']
+            elif row_number > audit_form_ranges[2] and row_number < audit_form_ranges[3]:
+                item_missed = ws['A31']
+            elif row_number > audit_form_ranges[3] and row_number < audit_form_ranges[4]:
+                item_missed = ws['A37']
+            elif row_number > audit_form_ranges[4] and row_number < audit_form_ranges[5]:
+                item_missed = ws['A43']
+            elif row_number > audit_form_ranges[5] and row_number < [6]:
+                item_missed = ws['']
+
+
+for file in files_to_rip:
+    wb = openpyxl.load_workbook(filename = file, data_only = True) # open the file
+    ws = wb['AUDIT TOOL'] # select the necessary sheet
+    cell_range = ws['C20':'C195'] # look at the "NO" column
+    for this_cell in cell_range: # look at each cell in the "NO" column
+        row_number = this_cell_coord[1:]         # store the row number without the column identifier
+        discipline = "A" + row_number   # store the coordinate of the discipline responsible
+
+
+
+
+
 
 
 
