@@ -194,6 +194,11 @@ ws['F6'] = "Forensic Counseling files incomplete:"
 ws['G6'] = str(forensic_incomplete)
 
 # Need to output sublists of item_and_clinician to their own two columns
+count = 2
+for pair in item_and_clinician:
+    ws['I' + str(count)] = pair[0]
+    ws['J' + str(count)] = pair[1]
+    count += 1
 
 # Saves the workbook
 wb.save(open_folder + fname)
