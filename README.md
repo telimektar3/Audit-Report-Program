@@ -22,7 +22,7 @@ If no file is created take the following steps:
 If the Files Processed does not match the number of files in the folder:
 1. Determine if any files are listed for  Incomplete scores
 2. Correct these files.
-3. Rune again.
+3. Run again.
 
 If all else fails email @telimektar3
 
