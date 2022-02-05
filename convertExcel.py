@@ -108,7 +108,6 @@ def get_responsible_clinician(discipline): # this function returns the name of t
     discipline_dict = {"Adult Counseling": counselor, "Social Work": social_worker, "Activity Therapy": activity_therapist, "Transitional Services": ts_counselor, "Forensics Clinical Treatment Services": fcts}
     if discipline_dict.get(discipline) != "": 
         ws = wb['AUDIT TOOL']
-        print(discipline_dict.get(discipline).value)
         return discipline_dict.get(discipline).value
     else:
         ws = wb['AUDIT TOOL']
