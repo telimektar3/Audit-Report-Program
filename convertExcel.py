@@ -106,60 +106,60 @@ def get_responsible_clinician(discipline): # this function returns the name of t
     ts_counselor = ws['B6']
     fcts = ws['B5']
     discipline_dict = {"Adult Counseling": counselor, "Social Work": social_worker, "Activity Therapy": activity_therapist, "Transitional Services": ts_counselor, "Forensics Clinical Treatment Services": fcts}
-    if discipline in discipline_dict:
+    if discipline_dict.get(discipline) != "": 
         ws = wb['AUDIT TOOL']
-        return (discipline, discipline_dict[discipline][1])
+        print(discipline_dict.get(discipline).value)
+        return discipline_dict.get(discipline).value
     else:
         ws = wb['AUDIT TOOL']
-        return
+        return "No clinician listed."
 
 row_number = "" # variable to store the row value of the "NO" response so that it can be used to determine the discipline responsible
 audit_form_ranges = [19, 25, 31, 37, 43, 49, 55, 63, 69, 75, 81, 87, 93, 100, 106, 114, 120, 128, 134, 140, 146, 154, 160, 166, 172, 178, 184, 190, 196] # gives the item description cells which also act as bounds for the checks for "NO" "x or X" responses
 clinician_item = [] # will store the clinician responsible and the item missed as a list here
 
-def items_missed_getter(this_cell): # funtion that returns a string of the item missed
+def items_missed_getter(cell, cell_value, discipline): # funtion that returns a string of the item missed
+    item_missed = ""
+    clinician = ""
     inc_count = 0 # this will count for incrementing through the audit form ranges
-    if this_cell != "":                          # if the cell has a value other than blank in it
-        this_cell_coord = this_cell.coordinate   # store it's coordinate in the sheet (ex. 'A7')
-        row_number = this_cell_coord[1:]         # store the row number without the column identifier
-        while inc_count != len(inc_count):
-            if row_number > audit_form_ranges[inc_count] and row_number < audit_form_ranges[inc_count + 1]:
-                item_missed = ws['A' + str(audit_form_ranges[inc_count])]
-                inc_count += 1
-            else:
-                inc_count += 1
-        return item_missed
+    if cell_value != None:        # if the cell has a value other than None
+        cell_value = cell_value.lower()
+        row_number = cell.row     # store the row number without the column identifier
+        if cell_value == "x":
+            while inc_count != len(audit_form_ranges):
+                inc_audit_range = audit_form_ranges[inc_count]
+                inc_audit_range_2 = audit_form_ranges[inc_count + 1]
+                if row_number > inc_audit_range and row_number < inc_audit_range_2:
+                    item_missed = ws['A' + str(audit_form_ranges[inc_count])]
+                    clinician = get_responsible_clinician(discipline)
+                    inc_count += 1
+                    return [item_missed, discipline, clinician]
+                else:
+                    inc_count += 1
+
+
     else:
         return
-            
-                
-                # elif row_number > audit_form_ranges[1] and row_number < audit_form_ranges[2]:
-                #     item_missed = ws['A25']
-                # elif row_number > audit_form_ranges[2] and row_number < audit_form_ranges[3]:
-                #     item_missed = ws['A31']
-                # elif row_number > audit_form_ranges[3] and row_number < audit_form_ranges[4]:
-                #     item_missed = ws['A37']
-                # elif row_number > audit_form_ranges[4] and row_number < audit_form_ranges[5]:
-                #     item_missed = ws['A43']
-                # elif row_number > audit_form_ranges[5] and row_number < [6]:
-                #     item_missed = ws['']
 
 item_and_clinician = [] # this will store the list of items missed and clinician responsible
-
-for file in files_to_rip: # this loop will create a list that has [item missed, clinican responsible] sublists
+for file in files_to_rip: # this loop will create a list that has [item missed, discipline, clinican responsible] sublists
+    import openpyxl.cell.cell 
     wb = openpyxl.load_workbook(filename = file, data_only = True) # open the file
-    ws = wb['AUDIT TOOL'] # select the necessary sheet
-    cell_range = ws['C20':'C195'] # look at the "NO" column
-    for this_cell in cell_range: # look at each cell in the "NO" column
-        this_cell_coord = this_cell.coordinate 
-        row_number = this_cell_coord[1:]         # store the row number without the column identifier
-        discipline = "A" + row_number   # store the coordinate of the discipline responsible
-        item_missed = items_missed_getter(this_cell)
-        responsible_clinician = get_responsible_clinician(discipline)
-        if item_missed != "" and responsible_clinician != "":
-            item_and_clinician.append([item_missed, responsible_clinician])
-        elif item_missed != "" and responsible_clinician == "":
-            item_and_clinician.append([item_missed, "No clinician listed"])
+    ws = wb['AUDIT TOOL']                                                            # select the necessary sheet
+    for row in ws.iter_rows(min_row=20, min_col = 3, max_col=3, max_row=195):        # look at each cell in the "NO" column
+        for cell in row:
+            row_number = cell.row        # store the row number without the column identifier
+            discipline_coordinate = "A" + str(row_number)   # store the coordinate of the discipline responsible
+            discipline = ws[discipline_coordinate].value
+            cell_value = cell.value
+            item_missed = items_missed_getter(cell, cell_value, discipline)
+            if item_missed != None:
+                if item_missed[0] != "" and item_missed[2] != None:
+                    item_missed = [file, item_missed[0], item_missed[1], item_missed[2]]
+                    item_and_clinician.append(item_missed)
+                else:
+                    item_missed = [file, item_missed[0], item_missed[1], "No clinician listed. Please see the following file: " + str(file)] 
+                    item_and_clinician.append(item_missed)
 
 
 
@@ -196,9 +196,15 @@ ws['G6'] = str(forensic_incomplete)
 # Need to output sublists of item_and_clinician to their own two columns
 count = 2
 for pair in item_and_clinician:
-    ws['I' + str(count)] = pair[0]
-    ws['J' + str(count)] = pair[1]
-    count += 1
+    if pair == None:
+        item_and_clinician = item_and_clinician[1:] 
+    else:
+        ws['I' + str(count)] = pair[0]
+        ws['J' + str(count)] = pair[1].value
+        ws['K' + str(count)] = pair[2]
+        ws['L' + str(count)] = pair[3]
+        count += 1
+
 
 # Saves the workbook
 wb.save(open_folder + fname)
