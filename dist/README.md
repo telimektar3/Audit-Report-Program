@@ -1,8 +1,8 @@
-# Audit-Report-Program v.0.1
+# Audit-Report-Program
  Python program to collate multiple Excel sheets into one Excel report
 
 HOW TO USE:
-Note: In order to set up the data you will need to use the CTS Audit Tool and make no changes to it's format as of 2/2/2022.
+Note: In order to set up the data you will need to use the CTS Audit Tool and make no changes to it's format as of 2/4/2022.
 
 1. Create a folder titled Audits to Process.
 2. Move all completed audit files that need to be processed into this folder.
@@ -25,8 +25,3 @@ If the Files Processed does not match the number of files in the folder:
 3. Run again.
 
 If all else fails email @telimektar3
-
-Still to implement:
-1. Identify the Policy number and discipline of "NO" items
-2. Identify the staff person responsible for the missed items
- 
