@@ -3,7 +3,6 @@
 
 # Batch reads and processes an auditing tool to determine the average audit score by discipline, and then outputs 
 # a file that includes the averages by discipline.
-import fractions
 from tkinter import Tk, filedialog
 import openpyxl
 import os
