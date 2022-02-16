@@ -274,7 +274,7 @@ def calculate_per_item(discipline, files_processed = files_processed):
     print(current_amounts)
     sum_items_correct = {}
     for key in current_amounts:
-        sum_items_correct[key] = float(current_amounts[key]/files_processed) * 100
+        sum_items_correct[key] = float((files_processed - current_amounts[key])/files_processed) * 100
     return sum_items_correct
 
 
@@ -285,7 +285,7 @@ for discipline in report_worksheet_dict:
     for item in new_per_item:
         new_item = item.split(" ", 1)
         active_spreadsheet["D" + str(count)] = item + " percent correct:"
-        active_spreadsheet["E" + str(count] = str(new_per_item[item])
+        active_spreadsheet["E" + str(count)] = str(new_per_item[item])
         count += 1
 
 
