@@ -288,24 +288,6 @@ for discipline in report_worksheet_dict:
         active_spreadsheet["E" + str(count)] = str(new_per_item[item])
         count += 1
 
-
-    
-    #  for row in ws.iter_rows(min_row=20, min_col = 3, max_col=3, max_row=195):        # look at each cell in the "NO" column
-    #     for cell in row:
-    #         row_number = cell.row        # store the row number without the column identifier
-    #         discipline_coordinate = "A" + str(row_number)   # store the coordinate of the discipline responsible
-    #         discipline = ws[discipline_coordinate].value
-    #         cell_value = cell.value
-    #         item_missed = items_missed_getter(cell, cell_value, discipline)
-    #         if item_missed != None:
-    #             if item_missed[0] != "" and item_missed[2] != None:
-    #                 item_missed = [file, item_missed[0], item_missed[1], item_missed[2]]
-    #                 item_and_clinician.append(item_missed)
-    #             else:
-    #                 item_missed = [file, item_missed[0], item_missed[1], "No clinician listed. Please see the following file: " + str(file)] 
-    #                 item_and_clinician.append(item_missed)
-
-
 # Saves the workbook
 wb.save(open_folder + fname)
 
