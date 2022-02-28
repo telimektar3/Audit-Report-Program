@@ -270,7 +270,7 @@ def calculate_per_item(discipline, files_processed = files_processed):
                 item_number = cell.value.split(" ", 0)
                 item_number = item_number[0]
                 items_missed.append(item_number)
-    current_amounts = counter(items_missed) # this isn't doing what is expected
+    current_amounts = counter(items_missed)
     print(current_amounts)
     sum_items_correct = {}
     for key in current_amounts:
