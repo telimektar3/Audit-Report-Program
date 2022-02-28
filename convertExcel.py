@@ -8,6 +8,7 @@ import openpyxl
 import os
 from datetime import datetime as dt
 from openpyxl import Workbook
+from collections import Counter as counter
 
 # Creates filename including todays date
 mask = '%d%m%Y'
@@ -74,7 +75,8 @@ for file in files_to_rip: # looks at each file in the folder
         forensic_incomplete.append(file)
 
 
-    
+item_dict = {"1.1": ws["A19"].value, "1.2": ws["A25"].value, "1.3": ws["A31"].value, "1.4": ws["A37"].value, "1.5": ws["A43"].value, "1.6": ws["A49"].value, "1.7": ws["A55"].value, "2.1": ws["A63"].value, "2.2": ws["A69"].value, "2.3": ws["A75"].value, "2.4": ws["A81"].value, "2.5": ws["A87"].value, "2.6": ws["A93"].value, "2.7": ws["A100"].value, "2.8": ws["A106"].value, "3.1": ws["A114"].value, "3.2": ws["A120"].value, "4.1": ws["A128"].value, "4.2": ws["A134"].value, "4.3": ws["A140"].value, "4.4": ws["A146"].value, "5.1": ws["A154"].value, "5.2": ws["A160"].value, "5.3": ws["A166"].value, "5.4": ws["A172"].value, "5.5": ws["A178"].value, "5.6": ws["A184"].value, "5.7": ws["A190"].value}
+   
 # Maths the data into averages by discipline
 # get sum of all numbers in lists
 social_sum = sum(social_work)
@@ -203,6 +205,88 @@ for pair in item_and_clinician:
         ws['L' + str(count)] = pair[3]
         count += 1
 
+# Create worksheets for each discipline's individual report to pull from
+ws_social_work = wb.create_sheet("Social Work")
+ws_activity_therapy = wb.create_sheet("Activity Therapy")
+ws_ics = wb.create_sheet("Psychology Counseling")
+ws_transitional_services = wb.create_sheet("Transitional Services")
+ws_forensic_counseling = wb.create_sheet("Forensic Counseling")
+
+report_worksheet_dict = {"Social Work": ws_social_work, "Activity Therapy": ws_activity_therapy, "Adult Counseling": ws_ics, "Transitional Services": ws_transitional_services, "Forensics Clinical Treatment Services": ws_forensic_counseling} # this dict will be used to cycle data to the appropriate sheet
+
+# Process Avg Audit Scores sheet into the individual discipline sheets
+data_for_sheet = []
+for row in ws.iter_rows(min_row = 2, min_col = 11, max_col = 11): # Iterate through the column reporting what discipline was responsible for a missed item in the current sheet "Avg Audit Scores"
+    for cell in row: # For each cell in the column
+        if cell.value != None:
+            row_number = cell.row # Generate the row number necessary to grab the data in the cells to the left (item missed) and to the right (clinician)
+            discipline = cell.value # Get the name of the discipline that missed the item so that it can be put into the correct spreadsheet
+            item_missed = ws["J" + str(row_number)].value # Get the value of the item missed
+            clinician = ws["L" + str(row_number)].value # Get the name of the clinician who missed the value
+            data_for_sheet.append([discipline, item_missed, clinician]) # Append a list of data to be assigned to the appropriate sheet
+        else:
+            pass
+
+
+# Messy sorting of the data_for_sheets into their own lists and then put those sorted lists into a new list
+social_work_list = []
+act_ther_list = []
+ics_list = []
+tran_list = []
+fcts_list = []  
+all_discipline_list = [social_work_list, act_ther_list, ics_list, tran_list, fcts_list]
+
+for list in data_for_sheet:
+    if list[0] == "Social Work":
+        social_work_list.append(list)
+    elif list[0] == "Activity Therapy":
+        act_ther_list.append(list)
+    elif list[0] == "Adult Counseling":
+        ics_list.append(list)
+    elif list[0] == "Transitional Services":
+        tran_list.append(list)
+    else:
+        fcts_list.append(list)
+
+
+# Write those sorted lists into their own sheets
+for target_discipline in all_discipline_list:
+    count = 2
+    for list in target_discipline:
+        if list == None:
+            data_for_sheet = data_for_sheet[1:] 
+        else:
+            active_spreadsheet = report_worksheet_dict[list[0]] # identify the correct spreadsheet to write to
+            active_spreadsheet["A" + str(count)] = list[1] # write the item missed to the an iterated cell in the A column
+            active_spreadsheet["B" + str(count)] = list[2] # write the clinician's name to an iterated cell in the B column
+            count += 1
+
+def calculate_per_item(discipline, files_processed = files_processed):
+    active_spreadsheet = report_worksheet_dict[discipline] # identify the sheet active
+    items_missed = []
+    for row in active_spreadsheet.iter_rows(min_row = 2, min_col = 1, max_col = 1): # check the item missed
+        for cell in row:
+            if cell.value != None:
+                item_number = cell.value.split(" ", 0)
+                item_number = item_number[0]
+                items_missed.append(item_number)
+    current_amounts = counter(items_missed)
+    print(current_amounts)
+    sum_items_correct = {}
+    for key in current_amounts:
+        sum_items_correct[key] = float((files_processed - current_amounts[key])/files_processed) * 100
+    return sum_items_correct
+
+
+for discipline in report_worksheet_dict:
+    new_per_item = calculate_per_item(discipline)
+    active_spreadsheet = report_worksheet_dict[discipline]
+    count = 2
+    for item in new_per_item:
+        new_item = item.split(" ", 1)
+        active_spreadsheet["D" + str(count)] = item + " percent correct:"
+        active_spreadsheet["E" + str(count)] = str(new_per_item[item])
+        count += 1
 
 # Saves the workbook
 wb.save(open_folder + fname)
