@@ -1,4 +1,4 @@
-# Audit Report Generator v1.0.0
+# Audit Report Generator v1.5.0
  Python program to collate multiple Excel sheets into one Excel report
 
 HOW TO USE:
