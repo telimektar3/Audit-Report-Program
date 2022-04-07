@@ -223,7 +223,8 @@ for row in ws.iter_rows(min_row = 2, min_col = 11, max_col = 11): # Iterate thro
             discipline = cell.value # Get the name of the discipline that missed the item so that it can be put into the correct spreadsheet
             item_missed = ws["J" + str(row_number)].value # Get the value of the item missed
             clinician = ws["L" + str(row_number)].value # Get the name of the clinician who missed the value
-            data_for_sheet.append([discipline, item_missed, clinician]) # Append a list of data to be assigned to the appropriate sheet
+            patient_id = ws["I" + str(row_number)].value # Get the file name of the file that the value was missed in
+            data_for_sheet.append([discipline, item_missed, clinician, patient_id]) # Append a list of data to be assigned to the appropriate sheet
         else:
             pass
 
@@ -259,6 +260,7 @@ for target_discipline in all_discipline_list:
             active_spreadsheet = report_worksheet_dict[list[0]] # identify the correct spreadsheet to write to
             active_spreadsheet["A" + str(count)] = list[1] # write the item missed to the an iterated cell in the A column
             active_spreadsheet["B" + str(count)] = list[2] # write the clinician's name to an iterated cell in the B column
+            active_spreadsheet["C" + str(count)] = list[3] #write the file name/patient ID to an iterated cell in the C column
             count += 1
 
 def calculate_per_item(discipline, files_processed = files_processed):
@@ -284,8 +286,8 @@ for discipline in report_worksheet_dict:
     count = 2
     for item in new_per_item:
         new_item = item.split(" ", 1)
-        active_spreadsheet["D" + str(count)] = item + " percent correct:"
-        active_spreadsheet["E" + str(count)] = str(new_per_item[item])
+        active_spreadsheet["E" + str(count)] = item + " Percent correct:"
+        active_spreadsheet["F" + str(count)] = str(new_per_item[item])
         count += 1
 
 # Saves the workbook
